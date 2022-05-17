@@ -8,11 +8,15 @@ const server = express();
 server.use(cors());
 server.use(express.json());
 
+//motor de plantillas
+server.set('view engine', 'ejs');
+
 // init express aplication
 const serverPort = 4000;
 server.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
 });
+
 //pido al servidor a través de un objeto ese listado de peliculas que esta guardada en esa constante
 server.get('/movies', (req, res) => {
   const genderFilterParams = req.query.gender ? req.query.gender : '';
@@ -24,6 +28,16 @@ server.get('/movies', (req, res) => {
       eachMovie.gender.includes(genderFilterParams)
     ),
   });
+});
+
+//id pelicula que se renderiza
+server.get('/movie/:movieId', (req, res) => {
+  console.log(req.params.movieId);
+  const movieFound = allMovies.find(
+    (movieItem) => movieItem.id === req.params.movieId
+  );
+  console.log(movieFound);
+  res.render('movie', movieFound);
 });
 
 //react lista
