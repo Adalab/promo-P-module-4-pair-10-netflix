@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 //guardo el json de mi listado de peliculas
 const allMovies = require('./movies.json');
+//importo bbdd
+const Database = require('better-sqlite3');
 
 // create and config server
 const server = express();
@@ -17,17 +19,25 @@ server.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
 });
 
-//pido al servidor a través de un objeto ese listado de peliculas que esta guardada en esa constante
-server.get('/movies', (req, res) => {
-  const genderFilterParams = req.query.gender ? req.query.gender : '';
-  console.log('Vamos a preparar un JSON');
+//base de datos
+const db = new Database('./src/database.db', { verbose: console.log });
 
-  res.json({
-    success: true,
-    movies: allMovies.filter((eachMovie) =>
-      eachMovie.gender.includes(genderFilterParams)
-    ),
-  });
+//pido al servidor a través de un objeto ese listado de peliculas que esta guardada en esa constante
+
+// cogemos datos de bbdd. todos los datos
+server.get('/movies', (req, res) => {
+  const query = db.prepare(`SELECT * FROM moviesList`);
+  const movieList = query.all();
+  res.render('movie', { movieList });
+
+  //  const genderFilterParams = req.query.gender ? req.query.gender : '';
+  //  console.log('Vamos a preparar un JSON');
+
+  // res.json({
+  // success: true,
+  // movies: allMovies.filter((eachMovie) =>
+  //  eachMovie.gender.includes(genderFilterParams)
+  // ),
 });
 
 //id pelicula que se renderiza
