@@ -1,9 +1,10 @@
 const express = require('express');
 const cors = require('cors');
-//guardo el json de mi listado de peliculas
+//IMPORTO JSON
 const allMovies = require('./movies.json');
-//importo bbdd
+//IMPORTO BBDD
 const Database = require('better-sqlite3');
+const DatabaseRegister = require('better-sqlite3');
 
 // create and config server
 const server = express();
@@ -13,32 +14,61 @@ server.use(express.json());
 //motor de plantillas
 server.set('view engine', 'ejs');
 
-// init express aplication
+// init express aplication --> ESCUCHO SERVIDOR
 const serverPort = 4000;
 server.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
 });
 
-//base de datos
+//BBDD
 const db = new Database('./src/database.db', { verbose: console.log });
+const dbRegister = new DatabaseRegister('./src/databaseRegister.db', {
+  verbose: console.log,
+});
 
-//pido al servidor a través de un objeto ese listado de peliculas que esta guardada en esa constante
-
-// cogemos datos de bbdd. todos los datos
+// ENDPOINT para obtener los datos de la BBDD
 server.get('/movies', (req, res) => {
   const query = db.prepare(`SELECT * FROM moviesList`);
   const movieList = query.all();
-  res.render('movie', { movieList });
-
-  //  const genderFilterParams = req.query.gender ? req.query.gender : '';
-  //  console.log('Vamos a preparar un JSON');
-
-  // res.json({
-  // success: true,
-  // movies: allMovies.filter((eachMovie) =>
-  //  eachMovie.gender.includes(genderFilterParams)
-  // ),
+  console.log(movieList);
+  res.json({ success: true, movies: movieList });
 });
+
+// ENDPOINT para nuevo REGISTRO de USUARIAS
+server.post('/signup', (req, res) => {
+  const query = db.prepare(
+    `INSERT INTO Registro (mail, password)VALUES (? , ? )`
+  );
+  const register = query.run(req.body.params.mail, req.body.params.password);
+
+  res.json({
+    success: true,
+    userId: 'nuevo-id-añadido',
+  });
+});
+
+//ENDPOINT para obtener los datos filtrados por genero
+/* server.get('/movies', (req, res) => {
+    const genderFilterParams = req.query.gender ? req.query.gender : '';
+    console.log('Vamos a preparar un JSON');
+  
+    res.json({
+      success: true,
+      movies: Allmovies,
+      movies: allMovies.filter((eachMovie) =>
+        eachMovie.gender.includes(genderFilterParams)
+      ),
+    });
+  });*/
+
+//ENDPOINT --> para obtener todos los datos del JSON
+/* server.get('/movies', (req, res) => {
+    console.log('Vamos a preparar un JSON');
+    res.json({
+      success: true,
+      movies: allMovies,
+    });
+  });*/
 
 //id pelicula que se renderiza
 server.get('/movie/:movieId', (req, res) => {
