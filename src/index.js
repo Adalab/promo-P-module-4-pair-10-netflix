@@ -20,8 +20,9 @@ server.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
 });
 
-//BBDD
+//BBDD PELICULAS
 const db = new Database('./src/database.db', { verbose: console.log });
+//BBDD REGISTRO
 const dbRegister = new DatabaseRegister('./src/databaseRegister.db', {
   verbose: console.log,
 });
@@ -34,12 +35,27 @@ server.get('/movies', (req, res) => {
   res.json({ success: true, movies: movieList });
 });
 
-// ENDPOINT para nuevo REGISTRO de USUARIAS
-server.post('/signup', (req, res) => {
-  const query = db.prepare(
-    `INSERT INTO Registro (mail, password)VALUES (? , ? )`
+// ENDPOINT para LOGIN de USUARIAS
+server.post('/login', (req, res) => {
+  console.log(req.body);
+  const query = dbRegister.prepare(
+    `INSERT INTO Register (mail, password) VALUES (? , ? )`
   );
-  const register = query.run(req.body.params.mail, req.body.params.password);
+  const registerData = query.run(req.body.userEmail, req.body.userPassword);
+
+  res.json({
+    success: true,
+    userId: 'nuevo-id-añadido',
+  });
+});
+
+// ENDPOINT para REGISTRO de USUARIAS
+server.post('/signup', (req, res) => {
+  console.log(req.body);
+  const query = dbRegister.prepare(
+    `INSERT INTO Register (mail, password) VALUES (? , ? )`
+  );
+  const registerData = query.run(req.body.userEmail, req.body.userPassword);
 
   res.json({
     success: true,
