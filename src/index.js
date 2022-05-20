@@ -1,16 +1,17 @@
 const express = require('express');
 const cors = require('cors');
 //IMPORTO JSON
-const allMovies = require('./movies.json');
+//const allMovies = require('./movies.json');
 //IMPORTO BBDD
 const Database = require('better-sqlite3');
 
-// create and config server
+// CREO Y CONFIGURO EL SERVIDOR
 const server = express();
+//CORS --> Permite que se hagan peticiones de otros sitios a mi servidor
 server.use(cors());
 server.use(express.json());
 
-//motor de plantillas
+//CONFIGURO MOTOR DE PLANTILLAS
 server.set('view engine', 'ejs');
 
 // init express aplication --> ESCUCHO SERVIDOR
@@ -19,12 +20,14 @@ server.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
 });
 
-//BBDD PELICULAS Y REGISTRO
+//BBDD con TABLAS : PELICULAS(moviesList) Y REGISTRO (Register)
 const db = new Database('./src/database.db', { verbose: console.log });
 
 // ENDPOINT para REGISTRO de USUARIAS
+//POST --> porque envío por BODY PARAMS los valores de los inputs AL SERVIDOR
 server.post('/signup', (req, res) => {
   console.log(req.body);
+  //INSERT --> Incluyo los datos del body params en mi BBDD
   const query = db.prepare(
     `INSERT INTO Register (email, password) VALUES (? , ? )`
   );
@@ -36,12 +39,24 @@ server.post('/signup', (req, res) => {
   });
 });
 
-// ENDPOINT para obtener los datos de la BBDD
+// ENDPOINT para obtener los datos de la BBDD para pintar mi listado principal
+//get--> pido al servidor
 server.get('/movies', (req, res) => {
   const query = db.prepare(`SELECT * FROM moviesList`);
+  //query all --> porque recibo un array de objetos
   const movieList = query.all();
-  console.log(movieList);
-  res.json({ success: true, movies: movieList });
+  //Filro para filtrar por genero. Hago filtro sobre mi BBDD
+  //Recibo por query params los generos.
+  //si esta vacío devuelvo todo, si no pinto por el genero recibido
+  const movieFilter = movieList.filter((movie) => {
+    if (req.query.gender === '') {
+      return true;
+    } else {
+      return movie.gender === req.query.gender ? true : false;
+    }
+  });
+  //respondo un JSON porque pinto en mi estático
+  res.json({ success: true, movies: movieFilter });
 });
 
 //ENDPOINT --> para obtener todos los datos del JSON
@@ -53,25 +68,14 @@ server.get('/movies', (req, res) => {
     });
   });*/
 
-//ENDPOINT para obtener los datos filtrados por genero
-/* server.get('/movies', (req, res) => {
-    const genderFilterParams = req.query.gender ? req.query.gender : '';
-    console.log('Vamos a preparar un JSON');
-  
-    res.json({
-      success: true,
-      movies: Allmovies,
-      movies: allMovies.filter((eachMovie) =>
-        eachMovie.gender.includes(genderFilterParams)
-      ),
-    });
-  });*/
-
 //SELECT PARA EL MOTOR DE PLANTILLAS - peli sacada de la BBDD
+//Los uso para pintar el detalle de cada peli
+//chequeo en la url ---> movie/1 = gambito de dama
 server.get('/movie/:movieId', (req, res) => {
   const query = db.prepare('SELECT * FROM moviesList WHERE movieId = ?');
   const movieFound = query.get(req.params.movieId);
   console.log(movieFound);
+  //respondo un render porque pinto en fichero dinámico
   res.render('movie', movieFound);
 });
 
@@ -85,10 +89,10 @@ server.get('/movie/:movieId', (req, res) => {
   res.render('movie', movieFound);
 });*/
 
-//react lista
-const staticServerPathWeb = './src/public-react'; // En esta carpeta ponemos los ficheros estáticos
+//FICHEROS ESTÁTICOS DE REACT
+const staticServerPathWeb = './src/public-react';
 server.use(express.static(staticServerPathWeb));
 
-//imagenes
-const staticServerPathWebImage = './src/public-movies-images'; // En esta carpeta ponemos los ficheros estáticos
+//FICHERO DE ESTÁTICO DE LAS IMAGENES
+const staticServerPathWebImage = './src/public-movies-images';
 server.use(express.static(staticServerPathWebImage));
