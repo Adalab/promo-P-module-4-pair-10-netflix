@@ -23,20 +23,27 @@ const sendLoginToApi = (data) => {
     });
 };
 
-// signup
+// SIGNUP
+//POST = Porque mandamos datos
+//Incluimos bodyParams con los datos que queremos mandar
 
 const sendSingUpToApi = (data) => {
   console.log('Se están enviando datos al signup:', data);
-  // CAMBIA ESTE FETCH PARA QUE APUNTE A UN ENDPOINT DE TU SERVIDOR, PIENSA SI DEBE SER GET O POST, PIENSA QUÉ DATOS DEBES ENVIAR, ETC
+
+  const bodyParams = {
+    email: data.email,
+    password: data.password,
+  };
   return fetch('http://localhost:4000/signup', {
     method: 'POST',
-    body: JSON.stringify(data),
+    body: JSON.stringify(bodyParams),
     headers: { 'Content-Type': 'application/json' },
   })
     .then((response) => response.json())
-    .then((data) => {
+    .then(() => {
       return data;
     });
+  //quito el data del 2º then para que me retorne los datos introducidos en data a front
 };
 
 // profile
