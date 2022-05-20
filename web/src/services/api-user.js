@@ -1,25 +1,15 @@
-// LOGIN
-//POST - porque mandamos datos
-// Incluimos los datos que queremos mandar en el objeto bodyparams
+// login
 
 const sendLoginToApi = (data) => {
   console.log('Se están enviando datos al login:', data);
-  const bodyParams = {
-    userEmail: data.email,
-    userPassword: data.password,
-  };
-  return fetch('http://localhost:4000/login', {
-    method: 'POST',
-    body: JSON.stringify(bodyParams),
-    headers: { 'Content-Type': 'application/json' },
-  })
+  // CAMBIA ESTE FETCH PARA QUE APUNTE A UN ENDPOINT DE TU SERVIDOR, PIENSA SI DEBE SER GET O POST, PIENSA QUÉ DATOS DEBES ENVIAR, ETC
+  return fetch(
+    '//beta.adalab.es/curso-intensivo-fullstack-recursos/apis/netflix-v1/empty.json'
+  )
     .then((response) => response.json())
-    .then((data) => {
-      return data;
-    });
-};
-// CAMBIA EL CONTENIDO DE ESTE THEN PARA GESTIONAR LA RESPUESTA DEL SERVIDOR Y RETORNAR AL COMPONENTE APP LO QUE NECESITA
-/* if (data.email.includes('userEmail')) {
+    .then(() => {
+      // CAMBIA EL CONTENIDO DE ESTE THEN PARA GESTIONAR LA RESPUESTA DEL SERVIDOR Y RETORNAR AL COMPONENTE APP LO QUE NECESITA
+      if (data.email.includes('gmail')) {
         return {
           success: true,
           userId: '123',
@@ -31,18 +21,18 @@ const sendLoginToApi = (data) => {
         };
       }
     });
-};*/
+};
 
 // SIGNUP
 //POST = Porque mandamos datos
-//Incluimos bosyParams con los datos que queremos mandar
+//Incluimos bodyParams con los datos que queremos mandar
 
 const sendSingUpToApi = (data) => {
   console.log('Se están enviando datos al signup:', data);
 
   const bodyParams = {
-    userEmail: data.email,
-    userPassword: data.password,
+    email: data.email,
+    password: data.password,
   };
   return fetch('http://localhost:4000/signup', {
     method: 'POST',
@@ -50,9 +40,10 @@ const sendSingUpToApi = (data) => {
     headers: { 'Content-Type': 'application/json' },
   })
     .then((response) => response.json())
-    .then((data) => {
+    .then(() => {
       return data;
     });
+  //quito el data del 2º then para que me retorne los datos introducidos en data a front
 };
 
 // profile

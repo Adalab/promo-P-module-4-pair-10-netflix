@@ -8,13 +8,11 @@
   </head>
   <body>
     <ul>
-      <% movieList.forEach(function (movie){ %>
       <li>
-        <h2><%= movie.name %></h2>
-        <p><%= movie.gender %></p>
-        <img src="<%= movie.image %>" />
+        <h2><%=name %></h2>
+        <p><%=gender %></p>
+        <img src="/<%=image %>" />
       </li>
-      <% })%>
     </ul>
   </body>
 </html>
