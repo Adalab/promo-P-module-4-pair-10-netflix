@@ -4,6 +4,7 @@ const cors = require('cors');
 //const allMovies = require('./movies.json');
 //IMPORTO BBDD
 const Database = require('better-sqlite3');
+const { response } = require('express');
 
 // CREO Y CONFIGURO EL SERVIDOR
 const server = express();
@@ -26,17 +27,28 @@ const db = new Database('./src/database.db', { verbose: console.log });
 // ENDPOINT para REGISTRO de USUARIAS
 //POST --> porque envío por BODY PARAMS los valores de los inputs AL SERVIDOR
 server.post('/signup', (req, res) => {
-  console.log(req.body);
-  //INSERT --> Incluyo los datos del body params en mi BBDD
-  const query = db.prepare(
-    `INSERT INTO Register (email, password) VALUES (? , ? )`
-  );
-  const registerData = query.run(req.body.email, req.body.password);
+  //comprobar el id del email en la BBDD
+  const selectEmail = db.prepare(`SELECT email FROM Register WHERE email = ?`);
 
-  res.json({
-    success: true,
-    userId: 'nuevo-id-añadido',
-  });
+  const foundEmail = selectEmail.get(req.body.email);
+
+  if (foundEmail === undefined) {
+    //INSERT --> Incluyo los datos del body params en mi BBDD
+    const query = db.prepare(
+      `INSERT INTO Register (email, password) VALUES (? , ? )`
+    );
+    const registerData = query.run(req.body.email, req.body.password);
+    console.log(registerData);
+    res.json({
+      success: true,
+      userId: 'Nuevo-id-añadido',
+    });
+  } else {
+    res.json({
+      success: false,
+      msj: 'Email existente',
+    });
+  }
 });
 
 // ENDPOINT para obtener los datos de la BBDD para pintar mi listado principal
